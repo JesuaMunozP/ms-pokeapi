@@ -1,13 +1,17 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
 import { lastValueFrom } from 'rxjs';
 import { IPokeapi } from './interface/pokeapi.interface';
+import { Cache } from 'cache-manager';
 
 
 @Injectable()
 export class PokeapiService {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
+    ) {}
 
   /*async findOne(id: string) {
     try {
@@ -31,20 +35,44 @@ export class PokeapiService {
 
   async findOne(id: string) {
     try {
-    const response = await axios.get<IPokeapi>(
-      `https://pokeapi.co/api/v2/pokemon/${id}`,
-    );
-    const arrayTypes = [];
-    response.data.types.forEach(item => arrayTypes.push(item.type.name));
-    const pokemon = {
-      id: id,
-      name: response.data.name,
-      type: arrayTypes,
-    };
-    return pokemon;
-    }catch (error) {
+      const response = await axios.get<IPokeapi>(
+        `https://pokeapi.co/api/v2/pokemon/${id}`,
+      );
+
+      const arrayTypes = [];
+      response.data.types.forEach((item) => arrayTypes.push(item.type.name));
+      const pokemon = {
+        id: id,
+        name: response.data.name,
+        type: arrayTypes,
+      };
+      return pokemon;
+    } catch (error) {
       return error;
-    } 
+    }
+  }
+
+  async findOneCached() {
+    try {
+      const response = await axios.get<IPokeapi>(
+        `https://pokeapi.co/api/v2/pokemon/1`,
+      );
+
+      await this.cacheManager.set('cached_item', response.data);
+
+      const cached = await this.cacheManager.get('cached_item');
+
+      /*const arrayTypes = [];
+      response.data.types.forEach((item) => arrayTypes.push(item.type.name));
+      const pokemon = {
+        name: response.data.name,
+        type: arrayTypes,
+      };
+      return pokemon;*/
+      
+      return cached;
+    } catch (error) {
+      return error;
+    }
   }
 }
-

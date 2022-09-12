@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, CacheKey } from '@nestjs/common';
 import { PokeapiService } from './pokeapi.service';
 
 @Controller('pokeapi')
@@ -8,5 +8,11 @@ export class PokeapiController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.pokeapiService.findOne(id);
+  }
+
+  @Get()
+  @CacheKey('some_route')
+  findOneCached() {
+    return this.pokeapiService.findOneCached();
   }
 }
