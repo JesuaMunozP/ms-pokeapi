@@ -5,14 +5,14 @@ import { PokeapiService } from './pokeapi.service';
 export class PokeapiController {
   constructor(private readonly pokeapiService: PokeapiService) {}
 
-  @Get(':id')
+  /*@Get(':id')
   findOne(@Param('id') id: string) {
     return this.pokeapiService.findOne(id);
-  }
+  }*/
 
-  @Get()
+  @Get(':id')
   @CacheKey('some_route')
-  findOneCached() {
-    return this.pokeapiService.findOneCached();
+  findOneCached(@Param('id') id: string) {
+    return this.pokeapiService.findOneCached(id);
   }
 }

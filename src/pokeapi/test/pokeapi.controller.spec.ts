@@ -5,7 +5,12 @@ import { PokeapiService } from '../pokeapi.service';
 describe('PokeapiController', () => {
   let controller: PokeapiController;
   const mockService = {
-    findOne: jest.fn( id => {
+   /* findOne: jest.fn( id => {
+      return {
+        id: '1',
+      }
+    }),*/
+    findOneCached: jest.fn( id => {
       return {
         id: '1',
       }
@@ -22,10 +27,15 @@ describe('PokeapiController', () => {
   });
 
   describe('Should return a product by parameter', () => {
-    it('findOne(), should find one product', () => {
+    /*it('findOne(), should find one product', () => {
         expect(controller.findOne('1')).toEqual({
             id: '1'
         });
-    });
+    });*/
+    it('findOne(), should find one product', () => {
+      expect(controller.findOneCached('1')).toEqual({
+          id: '1'
+      });
+  });
   });
 });

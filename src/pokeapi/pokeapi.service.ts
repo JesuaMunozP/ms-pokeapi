@@ -5,13 +5,12 @@ import { lastValueFrom } from 'rxjs';
 import { IPokeapi } from './interface/pokeapi.interface';
 import { Cache } from 'cache-manager';
 
-
 @Injectable()
 export class PokeapiService {
   constructor(
     private readonly httpService: HttpService,
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
-    ) {}
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+  ) {}
 
   /*async findOne(id: string) {
     try {
@@ -31,7 +30,7 @@ export class PokeapiService {
     } catch (error) {
       return error;
     } 
-  }*/
+  }
 
   async findOne(id: string) {
     try {
@@ -50,27 +49,25 @@ export class PokeapiService {
     } catch (error) {
       return error;
     }
-  }
+  }*/
 
-  async findOneCached() {
+  async findOneCached(id: string) {
     try {
-      const response = await axios.get<IPokeapi>(
-        `https://pokeapi.co/api/v2/pokemon/1`,
+      const response = await axios.get(
+        `https://pokeapi.co/api/v2/pokemon/${id}`,
       );
 
       await this.cacheManager.set('cached_item', response.data);
 
-      const cached = await this.cacheManager.get('cached_item');
+      const cached = await this.cacheManager.get<IPokeapi>('cached_item');
 
-      /*const arrayTypes = [];
-      response.data.types.forEach((item) => arrayTypes.push(item.type.name));
+      const arrayTypes = [];
+      cached.types.forEach((item) => arrayTypes.push(item.type.name));
       const pokemon = {
-        name: response.data.name,
+        name: cached.name,
         type: arrayTypes,
       };
-      return pokemon;*/
-      
-      return cached;
+      return pokemon;
     } catch (error) {
       return error;
     }

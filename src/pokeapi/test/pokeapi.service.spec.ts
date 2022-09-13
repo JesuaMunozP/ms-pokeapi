@@ -2,15 +2,18 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PokeapiService } from '../pokeapi.service';
 import { HttpService } from '@nestjs/axios';
 import { of } from 'rxjs';
-import { HttpException } from '@nestjs/common';
+import { HttpException, CACHE_MANAGER } from '@nestjs/common';
+import { Cache } from 'cache-manager';
 
 describe('PokeapiService', () => {
   let service: PokeapiService;
   let httpService: HttpService;
+  let cache: Cache;
 
   const mockRepository = {
     get: jest.fn(),
-    findOne: jest.fn()
+    findOne: jest.fn(),
+    findOneCached: jest.fn()
   };
 
   beforeEach(async () => {
@@ -21,11 +24,19 @@ describe('PokeapiService', () => {
           provide: HttpService,
           useValue: mockRepository,
         },
+        {
+          provide: CACHE_MANAGER,
+          useValue:  {
+            get: () => 'any value',
+            set: () => jest.fn(),
+          },
+        }
       ],
     }).compile();
 
     service = module.get<PokeapiService>(PokeapiService);
     httpService = module.get<HttpService>(HttpService);
+    cache = module.get(CACHE_MANAGER);
   });
 
   describe('should return a pokemon', () => {
@@ -35,7 +46,6 @@ describe('PokeapiService', () => {
         name: 'pokemon',
         type: ['1', '2'],
       };
-
       jest.spyOn(httpService, 'get').mockReturnValueOnce(
         of({
           status: 200,
@@ -56,7 +66,7 @@ describe('PokeapiService', () => {
         .catch((e) => {
           expect(e);
         });
-    });*/
+    });
     it('findOne(), should return a pokemon', async () => {
       expect(await service.findOne('4')).toEqual({
         id: expect.any(String),
@@ -70,6 +80,21 @@ describe('PokeapiService', () => {
         .catch((e) => {
           expect(e);
         });
+    });*/
+    it(`should cache the value`, async () => {
+      const spy = jest.spyOn(cache, 'set');  
+      await service.findOneCached('1');  
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
+    it('should get the value from cache', async () => {
+      const spy = jest.spyOn(cache, 'get');
+      await service.findOneCached('1');
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
+    it(`should return the value from the cache`, async () => {
+      jest.spyOn(cache, 'get').mockResolvedValueOnce('cached_item');      
+      const res = await service.findOneCached('1');   
+      expect(res).toBeDefined();
     });
   });
 });
