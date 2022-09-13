@@ -58,12 +58,11 @@ export class PokeapiService {
       );
 
       await this.cacheManager.set('cached_item', response.data);
-
       const cached = await this.cacheManager.get<IPokeapi>('cached_item');
-
       const arrayTypes = [];
-      cached.types.forEach((item) => arrayTypes.push(item.type.name));
+      cached.types?.forEach((item) => arrayTypes.push(item.type.name));
       const pokemon = {
+        id: id,
         name: cached.name,
         type: arrayTypes,
       };

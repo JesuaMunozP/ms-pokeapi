@@ -13,7 +13,8 @@ describe('PokeapiService', () => {
   const mockRepository = {
     get: jest.fn(),
     findOne: jest.fn(),
-    findOneCached: jest.fn()
+   // findOneCached: jest.fn()
+    findOneCached: jest.fn().mockImplementation((id) => Promise.resolve({ id: '4', name: 'pokemon' , type: ['1', '2', '3'],}),),
   };
 
   beforeEach(async () => {
@@ -81,6 +82,9 @@ describe('PokeapiService', () => {
           expect(e);
         });
     });*/
+
+    /////////cache/////////////
+
     it(`should cache the value`, async () => {
       const spy = jest.spyOn(cache, 'set');  
       await service.findOneCached('1');  
@@ -91,10 +95,12 @@ describe('PokeapiService', () => {
       await service.findOneCached('1');
       expect(spy).toHaveBeenCalledTimes(1);
     });
-    it(`should return the value from the cache`, async () => {
-      jest.spyOn(cache, 'get').mockResolvedValueOnce('cached_item');      
-      const res = await service.findOneCached('1');   
-      expect(res).toBeDefined();
+    it('findOne(), should return an error', async () => {
+      await service
+        .findOneCached(null)
+        .catch((e) => {
+          expect(e);
+        });
     });
   });
 });
