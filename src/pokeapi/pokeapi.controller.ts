@@ -5,14 +5,10 @@ import { PokeapiService } from './pokeapi.service';
 export class PokeapiController {
   constructor(private readonly pokeapiService: PokeapiService) {}
 
-  /*@Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.pokeapiService.findOne(id);
-  }*/
-
-  @Get(':id')
-  @CacheKey('some_route')
-  findOneCached(@Param('id') id: string) {
-    return this.pokeapiService.findOneCached(id);
+  @Post()
+  compararObjetos(@Body('objetoOld') objetoOld: any, @Body('objetoNew') objetoNew: any): void {
+    return this.pokeapiService.compararObjetos(objetoOld, objetoNew);
   }
+
+
 }

@@ -1,7 +1,7 @@
 import { CacheInterceptor, CacheModule, Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { PokeapiModule } from './pokeapi/pokeapi.module';
-import * as redisStore from 'cache-manager-redis-store';
+import { PokemonModule } from './pokemon/pokemon.module';
 
 @Module({
   imports: [
@@ -16,6 +16,7 @@ import * as redisStore from 'cache-manager-redis-store';
       max: 1000,
       isGlobal: true,
     }),
+    PokemonModule,
   ],
   controllers: [],
   providers: [
